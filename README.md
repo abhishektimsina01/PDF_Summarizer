@@ -89,7 +89,7 @@ text_splitter = RecursiveCharacterTextSplitter(
     chunk_overlap=100
 )
 chunks = text_splitter.split_documents(documents)
-
+```
 
 ---
 
@@ -149,9 +149,12 @@ Balance quality vs performance, not just size.
 Vector stores store embeddings and allow similarity search.
 
 1. FAISS (Local, In-Memory)
+
+```python
 from langchain.vectorstores import FAISS
 
 vectorstore = FAISS.from_documents(chunks, embeddings)
+```
 
 
 Use when:
@@ -163,13 +166,16 @@ Local experiments
 Fast prototyping
 
 2. Chroma (Persistent Local Storage)
+```python
 from langchain.vectorstores import Chroma
+
 
 vectorstore = Chroma.from_documents(
     chunks,
     embeddings,
     persist_directory="./chroma_db"
 )
+```
 
 
 Use when:
@@ -181,6 +187,7 @@ Small to medium projects
 Simple setup without cloud services
 
 3. Pinecone (Managed, Cloud)
+```python
 from langchain.vectorstores import Pinecone
 
 vectorstore = Pinecone.from_documents(
@@ -188,7 +195,7 @@ vectorstore = Pinecone.from_documents(
     embeddings,
     index_name="rag-index"
 )
-
+```
 
 Use when:
 
@@ -204,10 +211,12 @@ Retrievers decide which chunks are shown to the LLM.
 This step has the biggest impact on answer quality.
 
 1. Single-Query Similarity Search
+```python
 retriever = vectorstore.as_retriever(
     search_type="similarity",
     search_kwargs={"k": 4}
 )
+```
 
 
 How it works
@@ -223,6 +232,7 @@ Can miss relevant context
 Often retrieves repetitive chunks
 
 2. MMR (Max Marginal Relevance)
+```python
 retriever = vectorstore.as_retriever(
     search_type="mmr",
     search_kwargs={
@@ -230,7 +240,7 @@ retriever = vectorstore.as_retriever(
         "fetch_k": 15
     }
 )
-
+```
 
 Why MMR Is Better Than Simple Similarity
 
@@ -241,13 +251,14 @@ Avoids near-duplicate chunks
 Covers more aspects of the query
 
 3. Multi-Query Retrieval (Best)
+```python
 from langchain.retrievers.multi_query import MultiQueryRetriever
 
 retriever = MultiQueryRetriever.from_llm(
     retriever=vectorstore.as_retriever(search_type="mmr"),
     llm=llm
 )
-
+```
 
 Why Multi-Query Is Better Than MMR Alone
 
